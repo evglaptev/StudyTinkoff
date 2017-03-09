@@ -8,8 +8,9 @@ function Run() {
             var array1 = firstStr.split();
             array1.sort();
             var array2 = secondStr.split();
-            array1 == array2;
-            isAnagram = true;
+            if (array1 == array2) {
+                isAnagram = true;
+            }
         }
         printResult(isAnagram);
     }
