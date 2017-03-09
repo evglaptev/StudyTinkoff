@@ -2,23 +2,14 @@ function Run() {
     var firstWord = prompt("Input first word: ");
     var secondWord = prompt("Input second word: ");
     function anagramTest(firstStr, secondStr) {
-        var isAnagram = true;
+        var isAnagram = false;
 
         if (firstStr.length == secondStr.length) {
-            while (firstStr.length > 0) {
-                var search = secondStr.indexOf(firstStr[0]);
-                if (search == -1) {
-                    isAnagram = false;
-                    break;
-                }
-                else {
-                    firstStr = firstStr.substr(1); // New string without first char.
-                    secondStr = secondStr.substring(0, search) + secondStr.substr(search + 1); // New string without search char.
-                }
-            }
-        }
-        else {
-            isAnagram = false;
+            var array1 = firstStr.split();
+            array1.sort();
+            var array2 = secondStr.split();
+            array1 == array2;
+            isAnagram = true;
         }
         printResult(isAnagram);
     }
