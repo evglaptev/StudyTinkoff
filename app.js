@@ -5,23 +5,14 @@ function Run() {
         var isAnagram = false;
 
         if (firstStr.length == secondStr.length) {
-            var array1 = firstStr.split();
-            array1.sort();
-            var array2 = secondStr.split();
-            if (array1 == array2) {
-                isAnagram = true;
-            }
+            isAnagram = firstStr.toLowerCase().split('').sort().join('') == secondStr.toLowerCase().split('').sort().join('');
         }
         printResult(isAnagram);
     }
     function printResult(isAnagram) {
-        if (isAnagram) {
-            alert("Words are anagrams.");
-        }
-        else {
-            alert("Words aren`t anagrams.");
-        }
+        isAnagram ? alert("Words are anagrams.") : alert("Words aren`t anagrams.");
     }
+
     anagramTest(firstWord, secondWord);
 }
 Run();
