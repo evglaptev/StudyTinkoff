@@ -1,5 +1,6 @@
 
-
+"use strict";
+(function () {
     var result = 0;
 
     function sum(x) {
@@ -13,4 +14,5 @@
 
 
 
-alert(sum(1)(2)(3)())
+    alert(sum(1)(2)(3)());
+})();
