@@ -5,10 +5,11 @@
 
     function sum(x) {
         if (x === undefined) {
-            return result;
+            return this;//result;
         }
-        result += x;
-        return sum;
+        this.x += x;
+        //result += x;
+        return sum.bind(this);
     }
 
 
