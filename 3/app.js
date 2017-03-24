@@ -156,9 +156,12 @@ function onListClick(event) {
     model.refresh();
 }
 function onFilterClick(event) {
+
     var target = event.target;
-    model.setStatus(target.getAttribute("data-filter"));
-    model.refresh();
+    if (target.classList.contains("filters__item")) {
+        model.setStatus(target.getAttribute("data-filter"));
+        model.refresh();
+    }
 }
 
 function isStatusBtn(target) {
