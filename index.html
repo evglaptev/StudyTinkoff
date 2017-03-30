@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>TODO List</title>
-  <link rel="stylesheet" type="text/css" href="3/style.css">
+  <link rel="stylesheet" type="text/css" href="4/style.css">
 </head>
 <body>
 <h1 class="head">TODO List</h1>
@@ -31,10 +31,15 @@
 <template id="todoTemplate" style="display: none">
   <li class="list__item task">
     <div class="task__status task__status_todo"></div>
+      <div class="datetime__item">
+        <div class="task__time">{{TIME}}</div>
+        <div class="task__date">{{DATE}}</div>
+      </div>
+
     <span class="task__name">{{TODO}}</span>
     <div class="task__delete-button">❌</div>
   </li>
 </template>
-<script src="3/app.js"></script>
+<script src="4/app.js"></script>
 </body>
 </html>
