@@ -149,6 +149,18 @@ body {
     padding: 0;
     background-color: transparent;
 }
+.datetime__item{
+
+    float:left;
+    padding-right: 10px;
+    position:inherit;
+    top:-5px;
+    font-size:12px;
+    
+}
+.datetime__item span {
+    display:block;
+}
 
 .task__input:focus{
     outline: none;

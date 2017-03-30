@@ -11,19 +11,23 @@ var templateContainer = 'content' in templateElement ? templateElement.content :
 var todoList = [
 {
     name: 'Позвонить в сервис',
-    status: 'todo'
+    status: 'todo',
+    dateTime: new Date(Date.now())
 },
 {
     name: 'Купить хлеб',
-    status: 'done'
+    status: 'done',
+    dateTime: new Date(Date.now())
 },
 {
     name: 'Захватить мир',
-    status: 'todo'
+    status: 'todo',
+    dateTime: new Date(Date.now())
 },
 {
     name: 'Добавить тудушку в список',
-    status: 'todo'
+    status: 'todo',
+    dateTime: new Date(Date.now())
 }
 ]
 
@@ -56,22 +60,31 @@ Statistic.prototype.getDoneTasks = function () {
         return item.status === 'done'
     })
 }
-
+Statistic.prototype.getCountTotal = function () {
+    return this.getAllTasks().length
+}
+Statistic.prototype.getCountTodo = function () {
+    return this.getTodoTasks().length;
+}
+Statistic.prototype.getCountDone = function () {
+    return this.getDoneTasks().length;
+}
 
 function Model(tdList){
     this.status = filter.ALL,
      this.todoList = tdList;
+    this.refresh();
 }
+
 Model.prototype = Object.create(Statistic.prototype);
 
 Model.prototype.createTask = function (todo) {
          this.todoList.unshift(createNewTodo(todo));
 };
 Model.prototype.changeTodoStatus = function (todoContent) {
-        console.dir(todoContent);
-
         var index = this.getIndex(todoContent);
         todoList[index].status = todoList[index].status === 'todo' ? 'done' : 'todo';
+        todoList[index].dateTime = new Date(Date.now());
 
 };
 Model.prototype.deleteTask = function (todoContent) {
@@ -100,35 +113,40 @@ Model.prototype.refresh = function () {
         }, this).classList.add("filters__item_selected");
 
         var newList = this.getFunc(this.status).call(this).map(addTodoFromTemplate);
-        console.dir(this.getFunc(this.status));
         newList.forEach(function (element) {
             listElement.appendChild(element);
 
         })
-        document.querySelector(".statistic__total").textContent = this.getAllTasks().length;
-        document.querySelector(".statistic__done").textContent = this.getDoneTasks().length;
-        document.querySelector(".statistic__left").textContent = this.getTodoTasks().length;
+        document.querySelector(".statistic__total").textContent = this.getCountTotal();//AllTasks().length;
+        document.querySelector(".statistic__done").textContent = this.getCountDone();//DoneTasks().length;
+        document.querySelector(".statistic__left").textContent = this.getCountTodo();//TodoTasks().length;
 };
 Model.prototype.setStatus = function (status) {
         this.status = status;
     }
-
-
-
 
 var model = new Model(todoList);
 
 
 
 function addTodoFromTemplate(todo) {
+    var formatterTime = new Intl.DateTimeFormat("ru", {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric"
+    });
+    var formatterDate = new Intl.DateTimeFormat("en-US");
     var newElement = templateContainer.querySelector('.task').cloneNode(true);
     newElement.querySelector('.task__name').textContent = todo.name;
+    var date = newElement.querySelector('.datetime__item');
+    date.querySelector('.task__time').textContent =  formatterTime.format(todo.dateTime);
+    date.querySelector('.task__date').textContent = formatterDate.format(date.dateTime);
     setTodoStatusClassName(newElement, todo.status === 'todo');
 
     return newElement;
 }
 
-function s1etTodoStatusClassName(todo, flag) {
+function setTodoStatusClassName(todo, flag) {
     todo.classList.toggle('task_todo', flag);
     todo.classList.toggle('task_done', !flag);
 }
@@ -203,7 +221,8 @@ function checkIfTodoAlreadyExists(todoName) {
 function createNewTodo(name) {
     return {
         name: name,
-        status: 'todo'
+        status: 'todo',
+        dateTime: new Date(Date.now())
     }
 }
 
