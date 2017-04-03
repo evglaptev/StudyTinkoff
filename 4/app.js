@@ -70,13 +70,17 @@ Statistic.prototype.getCountDone = function () {
     return this.getDoneTasks().length;
 }
 
-function Model(tdList){
+function Model(tdList, stats) {
+    this.stats = stats;
     this.status = filter.ALL,
      this.todoList = tdList;
+    var listElement = document.querySelector('.list');
+    this.countTotal = document.querySelector(".statistic__total").textContent
+    this.countDone = document.querySelector(".statistic__done").textContent
+    this.countLeft = document.querySelector(".statistic__left").textContent
     this.refresh();
 }
 
-Model.prototype = Object.create(Statistic.prototype);
 
 Model.prototype.createTask = function (todo) {
          this.todoList.unshift(createNewTodo(todo));
@@ -102,7 +106,7 @@ Model.prototype.getIndex = function (todoContent) {
 };
 Model.prototype.refresh = function () {
         var newElement = templateContainer.querySelector('.task').cloneNode(true);
-        var listElement = document.querySelector('.list');
+
         listElement.textContent = "";
 
         var selectedFilter = document.querySelector(".filters__item_selected");
@@ -112,20 +116,22 @@ Model.prototype.refresh = function () {
             return item.getAttribute("data-filter") === this.status;
         }, this).classList.add("filters__item_selected");
 
-        var newList = this.getFunc(this.status).call(this).map(addTodoFromTemplate);
+        var newList = this.stats.getFunc(this.status).call(this).map(addTodoFromTemplate);
         newList.forEach(function (element) {
             listElement.appendChild(element);
 
         })
-        document.querySelector(".statistic__total").textContent = this.getCountTotal();//AllTasks().length;
-        document.querySelector(".statistic__done").textContent = this.getCountDone();//DoneTasks().length;
-        document.querySelector(".statistic__left").textContent = this.getCountTodo();//TodoTasks().length;
+
+        countTotal = this.stats.getCountTotal();
+        countDone = this.stats.getCountDone();
+        countLeft = this.stats.getCountTodo();
 };
 Model.prototype.setStatus = function (status) {
         this.status = status;
     }
 
-var model = new Model(todoList);
+var stats = new Statistic();
+var model = new Model(todoList,stats);
 
 
 
