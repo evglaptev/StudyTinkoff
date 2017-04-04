@@ -31,7 +31,7 @@ var todoList = [
 }
 ]
 
-var filter={
+var filterStatus={
     TODO:'todo',
     DONE:'done',
     ALL:'all'
@@ -39,45 +39,63 @@ var filter={
 
 
 function Statistic() {
+    this.countTotal = document.querySelector(".statistic__total").textContent;
+    this.countDone = document.querySelector(".statistic__done").textContent;
+    this.countLeft = document.querySelector(".statistic__left").textContent;
+    this.stats ={
+        todo:0,
+        done:0,
+        all:0
+    }
+}
+
+Statistic.prototype.renderStats = function () {
+    countTotal = this.stats.all;
+    countDone = this.stats.done;
+    countLeft = this.stats.todo;
+}
+
+
+Filter.prototype.renderFilter = function () {
+    var filterList;
+    if (this.currentFilter === filterStatus.ALL) {
+
+        filterList = this.todoList;
+    } else {
+        filterList = Array.prototype.filter.call(this.todoList, function (item) {
+            return item.status === this.currentFilter;
+        }, this);
+    }
+
+    filterList.forEach(function (item) {
+        listElement.appendChild(addTodoFromTemplate(item));
+    });
 
 }
-Statistic.prototype.getFunc = function (status) {
 
-    if (status === filter.ALL) return this.getAllTasks;
-    if (status === filter.DONE) return this.getDoneTasks;
-    return this.getTodoTasks;
+function Filter(todoList) {
+    this.todoList = todoList;
+    this.currentFilter = filterStatus.ALL;
+    this.renderFilter();
 }
-Statistic.prototype.getAllTasks = function () {
-    return this.todoList;
+
+
+Filter.prototype.changeCurrentFilter = function (newFilter) {
+    if (newFilter === this.currentFilter) return;
+
+
+    listElement.innerHTML = '';
+    this.currentFilter = newFilter;
+    this.renderFilter();
 }
-Statistic.prototype.getTodoTasks = function () {
-    return Array.prototype.filter.call(this.todoList, function (item) {
-        return item.status === 'todo'
-    })
-}
-Statistic.prototype.getDoneTasks = function () {
-    return Array.prototype.filter.call(this.todoList, function (item) {
-        return item.status === 'done'
-    })
-}
-Statistic.prototype.getCountTotal = function () {
-    return this.getAllTasks().length
-}
-Statistic.prototype.getCountTodo = function () {
-    return this.getTodoTasks().length;
-}
-Statistic.prototype.getCountDone = function () {
-    return this.getDoneTasks().length;
-}
+
 
 function Model(tdList, stats) {
     this.stats = stats;
-    this.status = filter.ALL,
+    this.status = filterStatus.ALL,
      this.todoList = tdList;
     var listElement = document.querySelector('.list');
-    this.countTotal = document.querySelector(".statistic__total").textContent
-    this.countDone = document.querySelector(".statistic__done").textContent
-    this.countLeft = document.querySelector(".statistic__left").textContent
+
     this.refresh();
 }
 
@@ -107,8 +125,6 @@ Model.prototype.getIndex = function (todoContent) {
 Model.prototype.refresh = function () {
         var newElement = templateContainer.querySelector('.task').cloneNode(true);
 
-        listElement.textContent = "";
-
         var selectedFilter = document.querySelector(".filters__item_selected");
         selectedFilter.classList.remove("filters__item_selected");
 
@@ -116,15 +132,10 @@ Model.prototype.refresh = function () {
             return item.getAttribute("data-filter") === this.status;
         }, this).classList.add("filters__item_selected");
 
-        var newList = this.stats.getFunc(this.status).call(this).map(addTodoFromTemplate);
-        newList.forEach(function (element) {
-            listElement.appendChild(element);
+        //var newList = this.stats.getFunc(this.status).call(this).map(addTodoFromTemplate);
+  
 
-        })
 
-        countTotal = this.stats.getCountTotal();
-        countDone = this.stats.getCountDone();
-        countLeft = this.stats.getCountTodo();
 };
 Model.prototype.setStatus = function (status) {
         this.status = status;
@@ -132,6 +143,7 @@ Model.prototype.setStatus = function (status) {
 
 var stats = new Statistic();
 var model = new Model(todoList,stats);
+var filter = new Filter(model.todoList);
 
 
 
@@ -175,8 +187,8 @@ function onFilterClick(event) {
 
     var target = event.target;
     if (target.classList.contains("filters__item")) {
-        model.setStatus(target.getAttribute("data-filter"));
-        model.refresh();
+        var newFilter = target.getAttribute("data-filter");
+        filter.changeCurrentFilter(newFilter);
     }
 }
 
