@@ -38,23 +38,45 @@ var filterStatus={
 }
 
 
-function Statistic() {
-    this.countTotal = document.querySelector(".statistic__total").textContent;
-    this.countDone = document.querySelector(".statistic__done").textContent;
-    this.countLeft = document.querySelector(".statistic__left").textContent;
+function Statistic(countTodoDone) {
+
+    this.countTotal = document.querySelector(".statistic__total"),
+    this.countDone = document.querySelector(".statistic__done"),
+    this.countLeft = document.querySelector(".statistic__left"),
     this.stats ={
-        todo:0,
-        done:0,
-        all:0
+        todo:countTodoDone.countTodo,
+        done:countTodoDone.countDone,
+        all:this.todo+this.done // Как all присвоить todo+done?
     }
+
 }
 
+Statistic.prototype.setCountDoneTodo = function(done,todo)
+{
+    this.stats.done = done;
+    this.stats.todo = todo;
+    this.stats.all = done + todo;
+}
 Statistic.prototype.renderStats = function () {
-    countTotal = this.stats.all;
-    countDone = this.stats.done;
-    countLeft = this.stats.todo;
+    this.countTotal.textContent = this.stats.all;
+    this.countDone.textContent = this.stats.done;
+    this.countLeft.textContent = this.stats.todo;
+    console.dir(this.stats);
 }
 
+Filter.prototype.getCountTodoDone = function () {
+    var countTodoDone = {
+        countTodo: this.getFilteredFromList(FileList.TODO),
+        countDone: this.getFilteredFromList(FileList.DONE)
+    }
+    return countTodoDone;
+}
+
+Filter.prototype.getFilteredFromList = function (filter) {
+    return Array.prototype.filter.call(todoList, function (item) {
+        return item.status === this;
+    }, filter);
+}
 
 Filter.prototype.renderFilter = function () {
     var filterList;
@@ -62,9 +84,7 @@ Filter.prototype.renderFilter = function () {
 
         filterList = this.todoList;
     } else {
-        filterList = Array.prototype.filter.call(this.todoList, function (item) {
-            return item.status === this.currentFilter;
-        }, this);
+        filterList = this.getFilteredFromList(this.currentFilter);
     }
 
     filterList.forEach(function (item) {
@@ -91,24 +111,17 @@ Filter.prototype.changeCurrentFilter = function (newFilter) {
 
 
 function Model(tdList, stats) {
-    this.stats = stats;
-    this.status = filterStatus.ALL,
+    this.statistic = stats;
+    //this.status = filterStatus.ALL,
      this.todoList = tdList;
     var listElement = document.querySelector('.list');
-
-    this.refresh();
 }
 
 
 Model.prototype.createTask = function (todo) {
          this.todoList.unshift(createNewTodo(todo));
 };
-Model.prototype.changeTodoStatus = function (todoContent) {
-        var index = this.getIndex(todoContent);
-        todoList[index].status = todoList[index].status === 'todo' ? 'done' : 'todo';
-        todoList[index].dateTime = new Date(Date.now());
 
-};
 Model.prototype.deleteTask = function (todoContent) {
         var index = this.getIndex(todoContent);
 
@@ -122,7 +135,7 @@ Model.prototype.getIndex = function (todoContent) {
         })
         .indexOf(todoContent);
 };
-Model.prototype.refresh = function () {
+Model.prototype.r2efresh = function () {
         var newElement = templateContainer.querySelector('.task').cloneNode(true);
 
         var selectedFilter = document.querySelector(".filters__item_selected");
@@ -141,10 +154,11 @@ Model.prototype.setStatus = function (status) {
         this.status = status;
     }
 
-var stats = new Statistic();
-var model = new Model(todoList,stats);
-var filter = new Filter(model.todoList);
 
+
+var filter = new Filter(todoList);
+var statistic = new Statistic(filter.getCountTodoDone());
+var model = new Model(todoList,statistic);
 
 
 function addTodoFromTemplate(todo) {
@@ -181,8 +195,26 @@ function onListClick(event) {
     if (isDeleteBtn(target)) {
         model.deleteTask(todoText);
     }
-    model.refresh();
 }
+Model.prototype.changeTodoStatus = function (todoContent) {
+    var index = this.getIndex(todoContent);
+    var newStatus;
+    if (todoList[index].status === 'todo'){
+        this.statistic.stats.todo++;
+        this.statistic.stats.done--;
+        newStatus = 'done'}
+        else {
+        this.statistic.stats.todo--;
+        this.statistic.stats.done++;
+        newStatus = 'todo'
+    }
+    todoList[index].status = newStatus;
+    todoList[index].dateTime = new Date(Date.now());
+    this.statistic.renderStats();
+    setTodoStatusClassName()
+
+
+};
 function onFilterClick(event) {
 
     var target = event.target;
